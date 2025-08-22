@@ -1,6 +1,5 @@
 package com.ciril.flagchallenge.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.ciril.flagchallenge.databinding.ActivityMainBinding
