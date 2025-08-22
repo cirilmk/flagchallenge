@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_grey_box"
+    android:layout_margin="2dp"
+    android:padding="8dp">
+
+    <!-- Timer Black Box -->
+    <TextView
+        android:id="@+id/tvTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_black_box"
+        android:gravity="center"
+        android:minWidth="60dp"
+        android:minHeight="40dp"
+        android:text="00:10"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Heading -->
+    <TextView
+        android:id="@+id/tvHeading"
+        style="@style/HeaderTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FLAGS CHALLENGE"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTimer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvTimer" />
+
+    <!--Separator-->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@drawable/bg_seperator_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTimer" />
+
+    <!-- Sub Heading -->
+    <TextView
+        android:id="@+id/tvSubHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="CHALLENGE SCHEDULE"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTimer" />
+
+    <!-- Labels Row -->
+    <TextView
+        android:id="@+id/tvHour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Hour"
+        app:layout_constraintEnd_toStartOf="@+id/tvMinute"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubHeading" />
+
+    <TextView
+        android:id="@+id/tvMinute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Minute"
+        app:layout_constraintEnd_toStartOf="@+id/tvSecond"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvHour"
+        app:layout_constraintTop_toTopOf="@id/tvHour" />
+
+    <TextView
+        android:id="@+id/tvSecond"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Second"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/tvMinute"
+        app:layout_constraintTop_toTopOf="@id/tvMinute" />
+
+    <!-- Hour Boxes -->
+    <EditText
+        android:id="@+id/etHour1"
+        style="@style/TimeBoxStyle"
+        app:layout_constraintStart_toStartOf="@id/tvHour"
+        app:layout_constraintTop_toBottomOf="@id/tvHour"
+        app:layout_constraintEnd_toStartOf="@id/etHour2"
+        android:layout_marginEnd="2dp"/>
+
+    <EditText
+        android:id="@+id/etHour2"
+        style="@style/TimeBoxStyle"
+        app:layout_constraintStart_toEndOf="@id/etHour1"
+        app:layout_constraintTop_toTopOf="@id/etHour1"
+        app:layout_constraintEnd_toEndOf="@id/tvHour"
+        android:layout_marginStart="2dp"/>
+
+    <!-- Minute Boxes -->
+    <EditText
+        android:id="@+id/etMin1"
+        style="@style/TimeBoxStyle"
+        app:layout_constraintStart_toStartOf="@id/tvMinute"
+        app:layout_constraintTop_toTopOf="@id/etHour1"
+        app:layout_constraintEnd_toStartOf="@id/etMin2"
+        android:layout_marginEnd="2dp"/>
+
+    <EditText
+        android:id="@+id/etMin2"
+        style="@style/TimeBoxStyle"
+        app:layout_constraintStart_toEndOf="@id/etMin1"
+        app:layout_constraintTop_toTopOf="@id/etMin1"
+        app:layout_constraintEnd_toEndOf="@id/tvMinute"
+        android:layout_marginStart="2dp"/>
+
+    <!-- Second Boxes -->
+    <EditText
+        android:id="@+id/etSec1"
+        style="@style/TimeBoxStyle"
+        app:layout_constraintStart_toStartOf="@id/tvSecond"
+        app:layout_constraintTop_toTopOf="@id/etHour1"
+        app:layout_constraintEnd_toStartOf="@id/etSec2"
+        android:layout_marginEnd="2dp"/>
+
+    <EditText
+        android:id="@+id/etSec2"
+        style="@style/TimeBoxStyle"
+        app:layout_constraintEnd_toEndOf="@id/tvSecond"
+        app:layout_constraintStart_toEndOf="@id/etSec1"
+        app:layout_constraintTop_toTopOf="@id/etSec1"
+        android:layout_marginStart="2dp"/>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="48dp"
+        android:background="@drawable/bg_button_orange"
+        android:text="Save"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etHour1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

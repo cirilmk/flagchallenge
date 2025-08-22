@@ -4,8 +4,10 @@
     <color name="colorOnPrimary">#FFFFFF</color>
     <color name="colorSecondary">#FFFFFF</color>
     <color name="colorOnSecondary">#000000</color>
-    <color name="colorBackground">#D9D9D9</color>
+    <color name="colorBackground">#FFFFFF</color>
     <color name="colorOnBackground">#000000</color>
     <color name="colorSurface">#FFFFFF</color>
     <color name="colorOnSurface">#000000</color>
+    <color name="lightGrey">#ECEAEA</color>
+    <color name="colorBackgroundShape">#D9D9D9</color>
 </resources>
