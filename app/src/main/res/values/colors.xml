@@ -10,4 +10,7 @@
     <color name="colorOnSurface">#000000</color>
     <color name="lightGrey">#ECEAEA</color>
     <color name="colorBackgroundShape">#D9D9D9</color>
+    <color name="correctGreen">#01C414</color>
+    <color name="defaultOption">#484848</color>
+    <color name="wrongRed">#FF0000</color>
 </resources>

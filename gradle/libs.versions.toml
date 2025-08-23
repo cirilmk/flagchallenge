@@ -19,12 +19,20 @@ moshi = "1.15.1"
 # Image loading (Coil)
 coil = "2.7.0"
 
+# DI
+hilt = "2.51.1"
+
+# Pref
+datastore = "1.1.1"
+
 # Coroutines
 coroutines = "1.8.1"
 
 # Testing
 junit = "4.13.2"
 junitVersion = "1.1.5"
+coroutinesTest = "1.8.1"
+truth = "1.4.4"
 espressoCore = "3.5.1"
 
 [libraries]
@@ -39,6 +47,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 # JSON parsing (Moshi)
 moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
 moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi" }
+moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
 
 # Image loading (Coil)
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
@@ -47,18 +56,30 @@ coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
-# Testing
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-
 # Navigation
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui-ktx       = { group = "androidx.navigation", name = "navigation-ui-ktx",       version.ref = "navigation" }
+
+# DI
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+
+# Pref
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
+# Testing
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
 
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidxNavigationSafeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
+jetbrainsKotlinKapt = { id = "org.jetbrains.kotlin.kapt", version = "1.9.0" }
+hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
