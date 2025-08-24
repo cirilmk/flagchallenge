@@ -1,17 +1,14 @@
 package com.ciril.flagchallenge.ui.challenge
 
 import com.ciril.flagchallenge.model.FlagQuestion
+import com.ciril.flagchallenge.utils.ChallengeConfig
 import kotlin.math.min
-
-private const val QUESTION_SEC = 5
-private const val INTERVAL_SEC = 2
-private const val TOTAL_QUESTIONS = 5
 
 class ChallengeEngine(
     questionsAll: List<FlagQuestion>,
     private val startAtMillis: Long
 ) {
-    private val capped = min(TOTAL_QUESTIONS, questionsAll.size)
+    private val capped = min(ChallengeConfig.TOTAL_QUESTIONS, questionsAll.size)
     private val questions: List<FlagQuestion> = questionsAll.take(capped)
 
     // -1 = unanswered
@@ -29,7 +26,7 @@ class ChallengeEngine(
         }
 
         val elapsedSec = ((nowMillis - startAtMillis) / 1000L).coerceAtLeast(0L).toInt()
-        val perQ = QUESTION_SEC + INTERVAL_SEC
+        val perQ = ChallengeConfig.QUESTION_SEC + ChallengeConfig.INTERVAL_SEC
         val totalTimeline = capped * perQ
 
         if (elapsedSec >= totalTimeline) {
@@ -40,8 +37,8 @@ class ChallengeEngine(
         val tInBlock = elapsedSec % perQ
         val q = questions[qIndex]
 
-        return if (tInBlock < QUESTION_SEC) {
-            val remaining = QUESTION_SEC - tInBlock
+        return if (tInBlock < ChallengeConfig.QUESTION_SEC) {
+            val remaining = ChallengeConfig.QUESTION_SEC - tInBlock
             ChallengeState.Question(
                 index = qIndex,
                 remainingSec = remaining,

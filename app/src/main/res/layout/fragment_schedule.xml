@@ -9,7 +9,6 @@
     android:background="@drawable/bg_grey_box">
 
     <include
-        android:id="@+id/header"
         layout="@layout/header_common" />
 
     <!-- Sub Heading -->
@@ -25,8 +24,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTimer"
-        tools:ignore="NotSibling" />
+        app:layout_constraintTop_toBottomOf="@id/tvTimer"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/scheduleInputs"

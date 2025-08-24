@@ -1,21 +1,19 @@
 package com.ciril.flagchallenge.ui.challenge
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import coil.load
 import com.ciril.flagchallenge.R
 import com.ciril.flagchallenge.databinding.FragmentChallengeBinding
+import com.ciril.flagchallenge.databinding.HeaderCommonBinding
 import com.google.android.material.button.MaterialButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -25,6 +23,8 @@ import kotlinx.coroutines.launch
 class ChallengeFragment : Fragment() {
 
     private var _binding: FragmentChallengeBinding? = null
+
+    private lateinit var header: HeaderCommonBinding
     private val binding get() = _binding!!
 
     private val vm: ChallengeViewModel by viewModels()
@@ -35,6 +35,7 @@ class ChallengeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentChallengeBinding.inflate(inflater, container, false)
+        header = HeaderCommonBinding.bind(binding.root)
         return binding.root
     }
 
@@ -48,7 +49,7 @@ class ChallengeFragment : Fragment() {
                 when (s) {
                     is ChallengeState.Question -> {
                         binding.tvQIndex.text = (s.index + 1).toString()
-                        binding.tvTimer.text = "00:${s.remainingSec.toString().padStart(2, '0')}"
+                        header.tvTimer.text = "00:${s.remainingSec.toString().padStart(2, '0')}"
                         binding.tvPrompt.isGone = false
 
                         val url =
@@ -95,7 +96,7 @@ class ChallengeFragment : Fragment() {
 
                     is ChallengeState.Interval -> {
                         binding.tvQIndex.text = (s.index + 1).toString()
-                        binding.tvTimer.text = "00:${s.remainingSec.toString().padStart(2, '0')}"
+                        header.tvTimer.text = "00:${s.remainingSec.toString().padStart(2, '0')}"
 
                         val url =
                             "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
@@ -130,7 +131,11 @@ class ChallengeFragment : Fragment() {
                     is ChallengeState.Finished -> {
                         val action = R.id.action_challenge_to_result
                         val args = Bundle().apply { putInt("score", s.score) }
-                        findNavController().navigate(action, args)
+                        findNavController().navigate(action, args,
+                            navOptions {
+                                popUpTo(R.id.challengeFragment) { inclusive = true } // remove Challenge
+                            }
+                        )
                     }
                 }
             }

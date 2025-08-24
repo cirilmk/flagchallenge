@@ -6,23 +6,18 @@ import com.ciril.flagchallenge.data.repository.ChallengeRepository
 import com.ciril.flagchallenge.data.repository.ScheduleDataSource
 import com.ciril.flagchallenge.model.FlagQuestion
 import com.ciril.flagchallenge.utils.AppClock
+import com.ciril.flagchallenge.utils.ChallengeConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
-import kotlin.math.min
 
-private const val TOTAL_QUESTIONS = 5
 
 @HiltViewModel
 class ChallengeViewModel @Inject constructor(
@@ -42,7 +37,7 @@ class ChallengeViewModel @Inject constructor(
     init {
         // Load questions once, then respond to schedule changes.
         viewModelScope.launch(dispatcher) {
-            questions = questionsRepo.loadQuestions().take(TOTAL_QUESTIONS)
+            questions = questionsRepo.loadQuestions().take(ChallengeConfig.TOTAL_QUESTIONS)
 
             scheduleRepo.scheduledAt()
                 .distinctUntilChanged()

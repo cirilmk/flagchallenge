@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.ciril.flagchallenge.R
 import com.ciril.flagchallenge.databinding.FragmentScheduleBinding
+import com.ciril.flagchallenge.databinding.HeaderCommonBinding
 import com.ciril.flagchallenge.utils.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.collectLatest
 class ScheduleFragment : Fragment() {
 
     private var _binding: FragmentScheduleBinding? = null
+
+    private lateinit var header: HeaderCommonBinding
     private val binding get() = _binding!!
 
     private val vm: ScheduleViewModel by viewModels()
@@ -29,6 +32,7 @@ class ScheduleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
+        header = HeaderCommonBinding.bind(binding.root)
         return binding.root
     }
 
@@ -49,9 +53,15 @@ class ScheduleFragment : Fragment() {
             } else {
                 vm.saveSchedule(h, m, s)
                 Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_SHORT).show()
+                clearInputs()
                 hideKeyboard()
             }
         }
+    }
+
+    private fun clearInputs() = with(binding) {
+        listOf(etHour1, etHour2, etMin1, etMin2, etSec1, etSec2)
+            .forEach { it.text?.clear() }
     }
 
     private fun observeViewModel() {
@@ -60,13 +70,13 @@ class ScheduleFragment : Fragment() {
                 when (state) {
                     is ScheduleUiState.Idle -> {
                         binding.tvSubHeading.text = getString(R.string.challenge_schedule)
-                        binding.tvTimer.text = "--:--"
+                        header.tvTimer.text = "--:--"
                         binding.scheduleInputs.visibility = View.VISIBLE
                     }
                     is ScheduleUiState.Waiting -> {
                         // Before pre-start window
                         binding.tvSubHeading.text = getString(R.string.already_on_schedule)
-                        binding.tvTimer.text = "--:--"
+                        header.tvTimer.text = "--:--"
                         binding.scheduleInputs.visibility = View.VISIBLE
                     }
                     is ScheduleUiState.Prestart -> {

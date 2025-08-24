@@ -19,4 +19,8 @@ class ScheduleRepository @Inject constructor(@ApplicationContext private val con
 
     override fun scheduledAt(): Flow<Long?> =
         context.scheduleDataStore.data.map { prefs: Preferences -> prefs[KEY_SCHEDULED_AT] }
+
+    override suspend fun clearScheduledAt() {
+        context.scheduleDataStore.edit { it.remove(KEY_SCHEDULED_AT) } // <-- new
+    }
 }
