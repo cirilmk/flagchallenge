@@ -2,10 +2,6 @@ package com.ciril.flagchallenge.ui.challenge
 
 import com.ciril.flagchallenge.model.FlagQuestion
 
-const val PRESTART_WINDOW_SEC = 20
-const val QUESTION_SEC = 30
-const val INTERVAL_SEC = 10
-const val TOTAL_QUESTIONS = 15
 
 sealed class ChallengeState {
     data class Question(

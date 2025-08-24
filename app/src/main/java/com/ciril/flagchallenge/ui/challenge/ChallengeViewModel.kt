@@ -7,89 +7,77 @@ import com.ciril.flagchallenge.data.repository.ScheduleDataSource
 import com.ciril.flagchallenge.model.FlagQuestion
 import com.ciril.flagchallenge.utils.AppClock
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
 import kotlin.math.min
+
+private const val TOTAL_QUESTIONS = 5
 
 @HiltViewModel
 class ChallengeViewModel @Inject constructor(
     private val questionsRepo: ChallengeRepository,
     private val scheduleRepo: ScheduleDataSource,
-    private val clock: AppClock
+    private val clock: AppClock,
+    private val dispatcher: CoroutineDispatcher // Provide Main.immediate via Hilt
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow<ChallengeState?>(null)
     val ui: StateFlow<ChallengeState?> = _ui
 
     private var questions: List<FlagQuestion> = emptyList()
-    private val selections = IntArray(TOTAL_QUESTIONS) { -1 } // -1 = unanswered
+    private var engine: ChallengeEngine? = null
+    private var tickerJob: Job? = null
 
     init {
-        viewModelScope.launch {
+        // Load questions once, then respond to schedule changes.
+        viewModelScope.launch(dispatcher) {
             questions = questionsRepo.loadQuestions().take(TOTAL_QUESTIONS)
-            // tick every second and derive state from wall-clock + scheduledAt
-            combine(
-                scheduleRepo.scheduledAt().map { it ?: 0L },
-                _ui
-            ) { startAt, _ -> startAt }
+
+            scheduleRepo.scheduledAt()
+                .distinctUntilChanged()
                 .collect { startAt ->
-                    if (startAt <= 0L || questions.isEmpty()) return@collect
-                    // simple ticker loop
-                    while (true) {
-                        _ui.value = derive(startAt)
-                        delay(1000)
+                    tickerJob?.cancel()
+                    engine = null
+
+                    if (startAt == null || startAt <= 0L || questions.isEmpty()) {
+                        _ui.value = null
+                        return@collect
                     }
+                    startTicker(startAt)
                 }
         }
     }
 
-    private fun derive(startMillis: Long): ChallengeState {
-        val now = clock.now()
-        val elapsedSec = ((now - startMillis) / 1000L).toInt().coerceAtLeast(0)
-        val perQ = QUESTION_SEC + INTERVAL_SEC
-        val totalTimeline = TOTAL_QUESTIONS * perQ
-
-        if (elapsedSec >= totalTimeline) {
-            val score = (0 until min(TOTAL_QUESTIONS, questions.size))
-                .count { selections[it] == questions[it].answer_id }
-            return ChallengeState.Finished(score)
-        }
-
-        val qIndex = (elapsedSec / perQ).coerceIn(0, questions.lastIndex)
-        val tInBlock = elapsedSec % perQ
-        val q = questions[qIndex]
-
-        return if (tInBlock < QUESTION_SEC) {
-            val remaining = QUESTION_SEC - tInBlock
-            ChallengeState.Question(
-                index = qIndex,
-                remainingSec = remaining,
-                question = q,
-                selectionId = selections[qIndex].takeIf { it != -1 },
-                isLocked = remaining == 0
-            )
-        } else {
-            val remaining = perQ - tInBlock
-            val sel = selections[qIndex].takeIf { it != -1 }
-            ChallengeState.Interval(
-                index = qIndex,
-                remainingSec = remaining,
-                question = q,
-                selectionId = sel,
-                isCorrect = sel == q.answer_id
-            )
+    private fun startTicker(startMillis: Long) {
+        engine = ChallengeEngine(questions, startMillis)
+        tickerJob = viewModelScope.launch(dispatcher) {
+            // Emit immediately (no initial delay).
+            _ui.value = engine!!.derive(clock.now())
+            while (isActive) {
+                delay(1_000)
+                _ui.value = engine!!.derive(clock.now())
+            }
         }
     }
 
     fun selectOption(questionIndex: Int, countryId: Int) {
-        val s = _ui.value
-        if (s is ChallengeState.Question && !s.isLocked && s.index == questionIndex) {
-            selections[questionIndex] = countryId
+        val eng = engine ?: return
+        val current = _ui.value
+        if (current is ChallengeState.Question && !current.isLocked && current.index == questionIndex) {
+            eng.selectOption(questionIndex, countryId)
+            // Reflect immediately (don’t wait for next tick)
+            _ui.value = eng.derive(clock.now())
         }
     }
 }
