@@ -58,7 +58,12 @@ class ChallengeFragment : Fragment() {
 
                             val url =
                                 "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
-                            binding.ivFlag.load(url) { crossfade(true) }
+                            binding.ivFlag.load(url) {
+                                crossfade(true)
+                                placeholder(R.drawable.flag)
+                                error(R.drawable.flag)
+                                fallback(R.drawable.flag)
+                            }
 
 
                             renderOptions(
