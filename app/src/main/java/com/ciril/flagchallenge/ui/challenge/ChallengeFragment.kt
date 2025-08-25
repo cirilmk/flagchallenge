@@ -16,6 +16,7 @@ import coil.load
 import com.ciril.flagchallenge.R
 import com.ciril.flagchallenge.databinding.FragmentChallengeBinding
 import com.ciril.flagchallenge.databinding.HeaderCommonBinding
+import com.ciril.flagchallenge.model.FlagQuestion
 import com.google.android.material.button.MaterialButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -59,50 +60,15 @@ class ChallengeFragment : Fragment() {
                                 "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
                             binding.ivFlag.load(url) { crossfade(true) }
 
-                            val btns: List<MaterialButton> = listOf(
-                                binding.btnOpt1,
-                                binding.btnOpt2,
-                                binding.btnOpt3,
-                                binding.btnOpt4,
-                            )
-                            val lbls = listOf(
-                                binding.tvLbl1,
-                                binding.tvLbl2,
-                                binding.tvLbl3,
-                                binding.tvLbl4,
+
+                            renderOptions(
+                                q = s.question,
+                                qIndex = s.index,
+                                selectionId = s.selectionId,
+                                isLocked = s.isLocked,
+                                isInterval = false
                             )
 
-                            s.question.countries.take(4).forEachIndexed { i, c ->
-                                btns[i].text = c.country_name
-                                btns[i].isEnabled = !s.isLocked
-
-                                // if this country was selected, keep it highlighted
-                                val state = if (s.selectionId == c.id) {
-                                    OptionState.SELECTED
-                                } else {
-                                    OptionState.DEFAULT
-                                }
-                                btns[i].applyOptionState(state, lbls[i], requireContext())
-
-                                lbls[i].text = ""
-                                btns[i].setOnClickListener {
-                                    // Clear all first
-                                    btns.forEachIndexed { j, b ->
-                                        b.applyOptionState(
-                                            OptionState.DEFAULT,
-                                            lbls[j],
-                                            requireContext()
-                                        )
-                                    }
-                                    // Mark selected
-                                    btns[i].applyOptionState(
-                                        OptionState.SELECTED,
-                                        lbls[i],
-                                        requireContext()
-                                    )
-                                    vm.selectOption(s.index, c.id)
-                                }
-                            }
                         }
 
                         is ChallengeState.Interval -> {
@@ -113,44 +79,14 @@ class ChallengeFragment : Fragment() {
                                 "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
                             binding.ivFlag.load(url) { crossfade(true) }
 
-                            val btns: List<MaterialButton> = listOf(
-                                binding.btnOpt1,
-                                binding.btnOpt2,
-                                binding.btnOpt3,
-                                binding.btnOpt4,
-                            )
-                            val lbls = listOf(
-                                binding.tvLbl1,
-                                binding.tvLbl2,
-                                binding.tvLbl3,
-                                binding.tvLbl4,
+                            renderOptions(
+                                q = s.question,
+                                qIndex = s.index,
+                                selectionId = s.selectionId,
+                                isLocked = true,
+                                isInterval = true
                             )
 
-
-                            s.question.countries.take(4).forEachIndexed { i, c ->
-                                val isCorrect = c.id == s.question.answer_id
-                                val isSelected = s.selectionId == c.id
-                                btns[i].isEnabled = false
-                                when {
-                                    isCorrect -> btns[i].applyOptionState(
-                                        OptionState.CORRECT,
-                                        lbls[i],
-                                        requireContext()
-                                    )
-
-                                    isSelected -> btns[i].applyOptionState(
-                                        OptionState.WRONG,
-                                        lbls[i],
-                                        requireContext()
-                                    )
-
-                                    else -> btns[i].applyOptionState(
-                                        OptionState.DEFAULT,
-                                        lbls[i],
-                                        requireContext()
-                                    )
-                                }
-                            }
                         }
 
                         is ChallengeState.Finished -> {
@@ -165,6 +101,69 @@ class ChallengeFragment : Fragment() {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun renderOptions(
+        q: FlagQuestion,
+        qIndex: Int,
+        selectionId: Int?,
+        isLocked: Boolean,
+        isInterval: Boolean
+    ) {
+        val btns: List<MaterialButton> = listOf(
+            binding.btnOpt1,
+            binding.btnOpt2,
+            binding.btnOpt3,
+            binding.btnOpt4,
+        )
+        val lbls = listOf(
+            binding.tvLbl1,
+            binding.tvLbl2,
+            binding.tvLbl3,
+            binding.tvLbl4,
+        )
+
+        q.countries.take(4).forEachIndexed { i, c ->
+            btns[i].text = c.country_name
+        }
+
+        if (!isInterval) {
+            // Question phase
+            q.countries.take(4).forEachIndexed { i, c ->
+                btns[i].isEnabled = !isLocked
+                val state = if (selectionId == c.id) OptionState.SELECTED else OptionState.DEFAULT
+                btns[i].applyOptionState(state, lbls[i], requireContext())
+                lbls[i].text = ""
+                btns[i].setOnClickListener {
+                    // Clear visuals then mark selected
+                    btns.forEachIndexed { j, b -> b.applyOptionState(OptionState.DEFAULT, lbls[j], requireContext()) }
+                    btns[i].applyOptionState(OptionState.SELECTED, lbls[i], requireContext())
+                    vm.selectOption(qIndex, countryId = c.id)
+                }
+            }
+        } else {
+            // Interval phase
+            q.countries.take(4).forEachIndexed { i, c ->
+                val isCorrect = c.id == q.answer_id
+                val isSelected = selectionId == c.id
+                btns[i].isEnabled = false
+                when {
+                    isCorrect -> btns[i].applyOptionState(
+                        OptionState.CORRECT,
+                        lbls[i],
+                        requireContext()
+                    )
+
+                    isSelected -> btns[i].applyOptionState(
+                        OptionState.WRONG,
+                        lbls[i],
+                        requireContext()
+                    )
+
+                    else -> btns[i].applyOptionState(OptionState.DEFAULT, lbls[i], requireContext())
                 }
             }
         }
