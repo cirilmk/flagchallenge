@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,7 +15,9 @@ import androidx.navigation.fragment.findNavController
 import com.ciril.flagchallenge.R
 import com.ciril.flagchallenge.databinding.FragmentScheduleBinding
 import com.ciril.flagchallenge.databinding.HeaderCommonBinding
+import com.ciril.flagchallenge.utils.hasInternet
 import com.ciril.flagchallenge.utils.hideKeyboard
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -48,17 +51,23 @@ class ScheduleFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         binding.btnSave.setOnClickListener {
             val h = two(binding.etHour1.text?.toString(), binding.etHour2.text?.toString())
-            val m = two(binding.etMin1.text?.toString(),  binding.etMin2.text?.toString())
-            val s = two(binding.etSec1.text?.toString(),  binding.etSec2.text?.toString())
+            val m = two(binding.etMin1.text?.toString(), binding.etMin2.text?.toString())
+            val s = two(binding.etSec1.text?.toString(), binding.etSec2.text?.toString())
             if (h == 0 && m == 0 && s == 0) {
-                Toast.makeText(requireContext(), "Please set a time > 0", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please set a time > 0", Toast.LENGTH_SHORT)
+                    .show()
             } else {
+                if (!requireContext().hasInternet()) {
+                    noInternetNotification()
+                    return@setOnClickListener
+                }
                 vm.saveSchedule(h, m, s)
                 Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_SHORT).show()
                 clearInputs()
                 hideKeyboard()
             }
         }
+
     }
 
     private fun clearInputs() = with(binding) {
@@ -118,6 +127,17 @@ class ScheduleFragment : Fragment() {
         val d1 = tens?.trim().orEmpty().firstOrNull()?.digitToIntOrNull() ?: 0
         val d2 = ones?.trim().orEmpty().firstOrNull()?.digitToIntOrNull() ?: 0
         return d1 * 10 + d2
+    }
+
+    private fun noInternetNotification() {
+        Snackbar.make(
+            requireView(),
+            getString(R.string.no_internet),
+            Snackbar.LENGTH_SHORT
+        ).apply {
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+            show()
+        }
     }
 
     override fun onDestroyView() {

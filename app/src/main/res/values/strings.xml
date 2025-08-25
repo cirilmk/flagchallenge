@@ -17,4 +17,5 @@
     <string name="default_timer_string">--:--</string>
     <string name="question_number">%1$d</string>
     <string name="time_format">00:%1$02d</string>
+    <string name="no_internet">No internet connection. Please check your network.</string>
 </resources>
