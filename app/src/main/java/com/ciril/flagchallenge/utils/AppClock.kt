@@ -4,6 +4,6 @@ import android.os.SystemClock
 
 interface AppClock { fun now(): Long }
 
-object SystemClock : AppClock {
+object ElapsedRealtimeClock : AppClock {
     override fun now(): Long = SystemClock.elapsedRealtime()
 }

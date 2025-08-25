@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ciril.flagchallenge.R
 import com.ciril.flagchallenge.databinding.FragmentScheduleBinding
@@ -15,6 +17,7 @@ import com.ciril.flagchallenge.databinding.HeaderCommonBinding
 import com.ciril.flagchallenge.utils.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -38,7 +41,6 @@ class ScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupListeners()
         observeViewModel()
     }
@@ -65,36 +67,46 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            vm.ui.collectLatest { state ->
-                when (state) {
-                    is ScheduleUiState.Idle -> {
-                        binding.tvSubHeading.text = getString(R.string.challenge_schedule)
-                        header.tvTimer.text = "--:--"
-                        binding.scheduleInputs.visibility = View.VISIBLE
-                    }
-                    is ScheduleUiState.Waiting -> {
-                        // Before pre-start window
-                        binding.tvSubHeading.text = getString(R.string.already_on_schedule)
-                        header.tvTimer.text = "--:--"
-                        binding.scheduleInputs.visibility = View.VISIBLE
-                    }
-                    is ScheduleUiState.Prestart -> {
-                        binding.scheduleInputs.visibility = View.GONE
-                        // Show the required banner text with live 20s countdown
-                        val sec = state.secondsLeft.coerceIn(1, 20)
-                        binding.tvSubHeading.text = buildString {
-                            append(getString(R.string.will_start_in))
-                            append("\n")
-                            append(getString(R.string.time_format, sec))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.ui.collectLatest { state ->
+                    when (state) {
+                        is ScheduleUiState.Idle -> {
+                            binding.tvSubHeading.text = getString(R.string.challenge_schedule)
+                            header.tvTimer.text = "--:--"
+                            binding.scheduleInputs.visibility = View.VISIBLE
                         }
-                    }
-                    is ScheduleUiState.StartNow -> {
-                        // Navigate to Challenge
-                        findNavController().navigate(
-                            com.ciril.flagchallenge.ui.schedule.ScheduleFragmentDirections
-                                .actionScheduleToChallenge()
-                        )
+
+                        is ScheduleUiState.Waiting -> {
+                            // Before pre-start window
+                            binding.tvSubHeading.text = getString(R.string.already_on_schedule)
+                            header.tvTimer.text = "--:--"
+                            binding.scheduleInputs.visibility = View.VISIBLE
+                        }
+
+                        is ScheduleUiState.Prestart -> {
+                            binding.scheduleInputs.visibility = View.GONE
+                            // Show the required banner text with live 20s countdown
+                            val sec = state.secondsLeft.coerceIn(1, 20)
+                            binding.tvSubHeading.text = buildString {
+                                append(getString(R.string.will_start_in))
+                                append("\n")
+                                append(
+                                    getString(
+                                        R.string.time_format,
+                                        sec
+                                    )
+                                ) // Just need to update the format if needed other time
+                            }
+                        }
+
+                        is ScheduleUiState.StartNow -> {
+                            // Navigate to Challenge
+                            findNavController().navigate(
+                                com.ciril.flagchallenge.ui.schedule.ScheduleFragmentDirections
+                                    .actionScheduleToChallenge()
+                            )
+                        }
                     }
                 }
             }

@@ -23,9 +23,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
 
-    @Inject
-    lateinit var scheduleRepo: ScheduleDataSource
-
     private var _binding: FragmentResultBinding? = null
 
     private lateinit var header: HeaderCommonBinding
@@ -74,10 +71,6 @@ class ResultFragment : Fragment() {
                 revealed = true
                 crossfadeGameOverToScore()
             }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            scheduleRepo.clearScheduledAt()
         }
 
 

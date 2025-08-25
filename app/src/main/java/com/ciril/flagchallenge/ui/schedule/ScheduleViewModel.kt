@@ -14,13 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.ceil
 
 
 sealed class ScheduleUiState {
     data object Idle : ScheduleUiState()                       // nothing scheduled yet
-    data class Waiting(val secondsUntilPrestart: Long) : ScheduleUiState()
-    data class Prestart(val secondsLeft: Long) : ScheduleUiState() // 20..1
-    data object StartNow : ScheduleUiState()                   // time to go!
+    data class Waiting(val secondsUntilPrestart: Long) : ScheduleUiState() // Scheduled but yet to reach last 20 sec
+    data class Prestart(val secondsLeft: Long) : ScheduleUiState() // last 20 sec window 20..1
+    data object StartNow : ScheduleUiState()                   // reached the start time
 }
 
 @HiltViewModel
@@ -37,7 +38,7 @@ class ScheduleViewModel @Inject constructor(
     private var scheduledAtCache: Long? = null
 
     init {
-        // Observe persisted scheduled time and (re)start ticker
+        // Collect the stored target time and restart a 1s ticker whenever it changes
         viewModelScope.launch {
             repo.scheduledAt().collect { ts ->
                 scheduledAtCache = ts
@@ -46,12 +47,17 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    /***
+     * To add up the entered time by user to current time and save it on pref by the SAVE button click*/
     fun saveSchedule(hours: Int, minutes: Int, seconds: Int) {
         val totalSeconds = scheduleUseCase(hours, minutes, seconds)
         val target = clock.now() + totalSeconds * 1000L
         viewModelScope.launch { repo.setScheduledAt(target) }
     }
 
+    /***
+     * Method to calculate the remaining time if scheduled
+     * Based on the remaining time set the state accordingly*/
     private fun restartTickerIfNeeded() {
         tickerJob?.cancel()
         val target = scheduledAtCache ?: run { _ui.value = ScheduleUiState.Idle; return }
@@ -61,14 +67,15 @@ class ScheduleViewModel @Inject constructor(
                 when {
                     remainingMs <= 0L -> {
                         _ui.value = ScheduleUiState.StartNow
+                        repo.clearScheduledAt()
                         break
                     }
                     remainingMs <= 20_000L -> {
-                        val sec = (remainingMs + 999) / 1000 // ceil to show 20..1
+                        val sec = ceil(remainingMs / 1000.0).toLong() // ceil to show 20..1
                         _ui.value = ScheduleUiState.Prestart(sec)
                     }
                     else -> {
-                        val secUntilPre = ((remainingMs - 20_000L) + 999) / 1000
+                        val secUntilPre = ceil((remainingMs - 20_000L) / 1000.0).toLong()
                         _ui.value = ScheduleUiState.Waiting(secUntilPre)
                     }
                 }

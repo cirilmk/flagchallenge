@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FlagChallenge</string>
     <string name="challenge_schedule">CHALLENGE SCHEDULE</string>
-    <string name="already_on_schedule">Already on a schedule. \nIf you want, can reschedule</string>
+    <string name="already_on_schedule">Already on a schedule. \nYou can reschedule if required</string>
     <string name="will_start_in">CHALLENGE WILL START IN</string>
     <string name="save">Save</string>
     <string name="hour">Hour</string>

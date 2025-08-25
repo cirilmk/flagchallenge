@@ -2,7 +2,7 @@ package com.ciril.flagchallenge.domain.usecase
 
 class ScheduleChallengeUseCase {
     /**
-     * Sanitize the values,
+     * Sanitize the values, and return the total seconds
      * for now instead of validation, convert to 59 Sec/min
      * if entered values beyond that*/
     operator fun invoke(hours: Int, minutes: Int, seconds: Int): Int {
