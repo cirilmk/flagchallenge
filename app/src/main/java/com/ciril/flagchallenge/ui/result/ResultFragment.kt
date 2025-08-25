@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.ciril.flagchallenge.R
+import com.ciril.flagchallenge.data.repository.ScheduleDataSource
 import com.ciril.flagchallenge.databinding.FragmentResultBinding
 import com.ciril.flagchallenge.databinding.HeaderCommonBinding
 import com.ciril.flagchallenge.utils.ChallengeConfig
@@ -17,16 +18,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
+
+    @Inject
+    lateinit var scheduleRepo: ScheduleDataSource
 
     private var _binding: FragmentResultBinding? = null
 
     private lateinit var header: HeaderCommonBinding
     private val binding get() = _binding!!
-
-    private val vm: ResultViewModel by viewModels()
 
     private var revealJob: Job? = null
     private var revealed = false
@@ -47,10 +50,12 @@ class ResultFragment : Fragment() {
 
         // get score from args (you already navigate with "score")
         val score = arguments?.getInt("score") ?: 0
+        val scoreStr = String.format("%02d", score)
+        val totalQuestionsStr = String.format("%02d", ChallengeConfig.TOTAL_QUESTIONS)
         binding.tvScoreValue.text = getString(
             R.string.score_out_of,
-            score,
-            ChallengeConfig.TOTAL_QUESTIONS
+            scoreStr,
+            totalQuestionsStr
         )
 
         if (revealed) {
@@ -65,15 +70,14 @@ class ResultFragment : Fragment() {
             binding.scoreContainer.visibility = View.GONE
 
             revealJob = viewLifecycleOwner.lifecycleScope.launch {
-                delay(2000)
+                delay(1000)
                 revealed = true
                 crossfadeGameOverToScore()
             }
         }
 
-        // Clear the stored schedule so the next app launch shows Schedule
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            vm.clearSchedule()
+        viewLifecycleOwner.lifecycleScope.launch {
+            scheduleRepo.clearScheduledAt()
         }
 
 

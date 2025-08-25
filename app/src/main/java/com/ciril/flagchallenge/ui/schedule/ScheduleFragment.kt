@@ -85,9 +85,9 @@ class ScheduleFragment : Fragment() {
                         val sec = state.secondsLeft.coerceIn(1, 20)
                         binding.tvSubHeading.text = buildString {
                             append(getString(R.string.will_start_in))
-                            append("\n 00:${String.format("%02d", sec)}")
+                            append("\n")
+                            append(getString(R.string.time_format, sec))
                         }
-//                        binding.tvTimer.text = "00:${String.format("%02d", sec)}"
                     }
                     is ScheduleUiState.StartNow -> {
                         // Navigate to Challenge
@@ -106,11 +106,6 @@ class ScheduleFragment : Fragment() {
         val d1 = tens?.trim().orEmpty().firstOrNull()?.digitToIntOrNull() ?: 0
         val d2 = ones?.trim().orEmpty().firstOrNull()?.digitToIntOrNull() ?: 0
         return d1 * 10 + d2
-    }
-
-    private fun setSaveEnabled(enabled: Boolean) {
-        binding.btnSave.isEnabled = enabled
-        binding.btnSave.alpha = if (enabled) 1f else 0.5f
     }
 
     override fun onDestroyView() {

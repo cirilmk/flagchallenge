@@ -1,6 +1,10 @@
 package com.ciril.flagchallenge.domain.usecase
 
 class ScheduleChallengeUseCase {
+    /**
+     * Sanitize the values,
+     * for now instead of validation, convert to 59 Sec/min
+     * if entered values beyond that*/
     operator fun invoke(hours: Int, minutes: Int, seconds: Int): Int {
         val hh = hours.coerceAtLeast(0)
         val mm = minutes.coerceIn(0, 59)

@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import coil.load
@@ -44,102 +46,133 @@ class ChallengeFragment : Fragment() {
 
 
         viewLifecycleOwner.lifecycleScope.launch {
-            vm.ui.collectLatest { s ->
-                if (s == null) return@collectLatest
-                when (s) {
-                    is ChallengeState.Question -> {
-                        binding.tvQIndex.text = (s.index + 1).toString()
-                        header.tvTimer.text = "00:${s.remainingSec.toString().padStart(2, '0')}"
-                        binding.tvPrompt.isGone = false
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.ui.collectLatest { s ->
+                    if (s == null) return@collectLatest
+                    when (s) {
+                        is ChallengeState.Question -> {
+                            binding.tvQIndex.text = getString(R.string.question_number, s.index + 1)
+                            header.tvTimer.text = getString(R.string.time_format, s.remainingSec)
+                            binding.tvPrompt.isGone = false
 
-                        val url =
-                            "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
-                        binding.ivFlag.load(url) { crossfade(true) }
+                            val url =
+                                "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
+                            binding.ivFlag.load(url) { crossfade(true) }
 
-                        val btns: List<MaterialButton> = listOf(
-                            binding.btnOpt1,
-                            binding.btnOpt2,
-                            binding.btnOpt3,
-                            binding.btnOpt4,
-                        )
-                        val lbls = listOf(
-                            binding.tvLbl1,
-                            binding.tvLbl2,
-                            binding.tvLbl3,
-                            binding.tvLbl4,
-                        )
+                            val btns: List<MaterialButton> = listOf(
+                                binding.btnOpt1,
+                                binding.btnOpt2,
+                                binding.btnOpt3,
+                                binding.btnOpt4,
+                            )
+                            val lbls = listOf(
+                                binding.tvLbl1,
+                                binding.tvLbl2,
+                                binding.tvLbl3,
+                                binding.tvLbl4,
+                            )
 
-                        s.question.countries.take(4).forEachIndexed { i, c ->
-                            btns[i].text = c.country_name
-                            btns[i].isEnabled = !s.isLocked
+                            s.question.countries.take(4).forEachIndexed { i, c ->
+                                btns[i].text = c.country_name
+                                btns[i].isEnabled = !s.isLocked
 
-                            // if this country was selected, keep it highlighted
-                            val state = if (s.selectionId == c.id) {
-                                OptionState.SELECTED
-                            } else {
-                                OptionState.DEFAULT
-                            }
-                            btns[i].applyOptionState(state, lbls[i], requireContext())
-
-                            lbls[i].text = ""
-                            btns[i].setOnClickListener {
-                                // Clear all first
-                                btns.forEachIndexed { j, b ->
-                                    b.applyOptionState(OptionState.DEFAULT, lbls[j], requireContext())
+                                // if this country was selected, keep it highlighted
+                                val state = if (s.selectionId == c.id) {
+                                    OptionState.SELECTED
+                                } else {
+                                    OptionState.DEFAULT
                                 }
-                                // Mark selected
-                                btns[i].applyOptionState(OptionState.SELECTED, lbls[i], requireContext())
-                                vm.selectOption(s.index, c.id)
+                                btns[i].applyOptionState(state, lbls[i], requireContext())
+
+                                lbls[i].text = ""
+                                btns[i].setOnClickListener {
+                                    // Clear all first
+                                    btns.forEachIndexed { j, b ->
+                                        b.applyOptionState(
+                                            OptionState.DEFAULT,
+                                            lbls[j],
+                                            requireContext()
+                                        )
+                                    }
+                                    // Mark selected
+                                    btns[i].applyOptionState(
+                                        OptionState.SELECTED,
+                                        lbls[i],
+                                        requireContext()
+                                    )
+                                    vm.selectOption(s.index, c.id)
+                                }
                             }
                         }
-                    }
 
-                    is ChallengeState.Interval -> {
-                        binding.tvQIndex.text = (s.index + 1).toString()
-                        header.tvTimer.text = "00:${s.remainingSec.toString().padStart(2, '0')}"
+                        is ChallengeState.Interval -> {
+                            binding.tvQIndex.text = getString(R.string.question_number, s.index + 1)
+                            header.tvTimer.text = getString(R.string.time_format, s.remainingSec)
 
-                        val url =
-                            "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
-                        binding.ivFlag.load(url) { crossfade(true) }
+                            val url =
+                                "https://flagcdn.com/w160/${s.question.country_code.lowercase()}.png"
+                            binding.ivFlag.load(url) { crossfade(true) }
 
-                        val btns: List<MaterialButton> = listOf(
-                            binding.btnOpt1,
-                            binding.btnOpt2,
-                            binding.btnOpt3,
-                            binding.btnOpt4,
-                        )
-                        val lbls = listOf(
-                            binding.tvLbl1,
-                            binding.tvLbl2,
-                            binding.tvLbl3,
-                            binding.tvLbl4,
-                        )
+                            val btns: List<MaterialButton> = listOf(
+                                binding.btnOpt1,
+                                binding.btnOpt2,
+                                binding.btnOpt3,
+                                binding.btnOpt4,
+                            )
+                            val lbls = listOf(
+                                binding.tvLbl1,
+                                binding.tvLbl2,
+                                binding.tvLbl3,
+                                binding.tvLbl4,
+                            )
 
 
-                        s.question.countries.take(4).forEachIndexed { i, c ->
-                            val isCorrect = c.id == s.question.answer_id
-                            val isSelected = s.selectionId == c.id
-                            btns[i].isEnabled = false
-                            when {
-                                isCorrect -> btns[i].applyOptionState(OptionState.CORRECT, lbls[i], requireContext())
-                                isSelected -> btns[i].applyOptionState(OptionState.WRONG, lbls[i], requireContext())
-                                else -> btns[i].applyOptionState(OptionState.DEFAULT, lbls[i], requireContext())
+                            s.question.countries.take(4).forEachIndexed { i, c ->
+                                val isCorrect = c.id == s.question.answer_id
+                                val isSelected = s.selectionId == c.id
+                                btns[i].isEnabled = false
+                                when {
+                                    isCorrect -> btns[i].applyOptionState(
+                                        OptionState.CORRECT,
+                                        lbls[i],
+                                        requireContext()
+                                    )
+
+                                    isSelected -> btns[i].applyOptionState(
+                                        OptionState.WRONG,
+                                        lbls[i],
+                                        requireContext()
+                                    )
+
+                                    else -> btns[i].applyOptionState(
+                                        OptionState.DEFAULT,
+                                        lbls[i],
+                                        requireContext()
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    is ChallengeState.Finished -> {
-                        val action = R.id.action_challenge_to_result
-                        val args = Bundle().apply { putInt("score", s.score) }
-                        findNavController().navigate(action, args,
-                            navOptions {
-                                popUpTo(R.id.challengeFragment) { inclusive = true } // remove Challenge
-                            }
-                        )
+                        is ChallengeState.Finished -> {
+                            val action = R.id.action_challenge_to_result
+                            val args = Bundle().apply { putInt("score", s.score) }
+                            findNavController().navigate(action, args,
+                                navOptions {
+                                    popUpTo(R.id.challengeFragment) {
+                                        inclusive = true
+                                    } // remove Challenge
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.refreshNow()
     }
 
     override fun onDestroyView() {

@@ -9,6 +9,7 @@ import com.ciril.flagchallenge.utils.AppClock
 import com.ciril.flagchallenge.utils.ChallengeConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +57,7 @@ class ChallengeViewModel @Inject constructor(
 
     private fun startTicker(startMillis: Long) {
         engine = ChallengeEngine(questions, startMillis)
-        tickerJob = viewModelScope.launch(dispatcher) {
+        tickerJob = viewModelScope.launch(Dispatchers.Default) {
             // Emit immediately (no initial delay).
             _ui.value = engine!!.derive(clock.now())
             while (isActive) {
@@ -73,6 +74,12 @@ class ChallengeViewModel @Inject constructor(
             eng.selectOption(questionIndex, countryId)
             // Reflect immediately (don’t wait for next tick)
             _ui.value = eng.derive(clock.now())
+        }
+    }
+
+    fun refreshNow() {
+        engine?.let {
+            _ui.value = it.derive(clock.now())
         }
     }
 }

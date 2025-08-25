@@ -8,37 +8,36 @@ class ChallengeEngine(
     questionsAll: List<FlagQuestion>,
     private val startAtMillis: Long
 ) {
-    private val capped = min(ChallengeConfig.TOTAL_QUESTIONS, questionsAll.size)
-    private val questions: List<FlagQuestion> = questionsAll.take(capped)
-
-    // -1 = unanswered
-    private val selections = IntArray(capped) { -1 }
+    private val cap = min(ChallengeConfig.TOTAL_QUESTIONS, questionsAll.size)
+    private val questions = questionsAll.take(cap)
+    private val selections = IntArray(cap) { -1 }
 
     fun selectOption(questionIndex: Int, countryId: Int) {
-        if (questionIndex in 0 until capped) {
-            selections[questionIndex] = countryId
-        }
+        if (questionIndex in 0 until cap) selections[questionIndex] = countryId
     }
 
     fun derive(nowMillis: Long): ChallengeState {
-        if (questions.isEmpty() || startAtMillis <= 0L) {
+        if (startAtMillis <= 0L || questions.isEmpty()) {
             return ChallengeState.Finished(score())
         }
 
-        val elapsedSec = ((nowMillis - startAtMillis) / 1000L).coerceAtLeast(0L).toInt()
-        val perQ = ChallengeConfig.QUESTION_SEC + ChallengeConfig.INTERVAL_SEC
-        val totalTimeline = capped * perQ
+        val qSec = ChallengeConfig.QUESTION_SEC
+        val iSec = ChallengeConfig.INTERVAL_SEC
+        val perQ = qSec + iSec
 
-        if (elapsedSec >= totalTimeline) {
-            return ChallengeState.Finished(score())
-        }
+        // no interval after last question
+        val totalTimeline = if (cap <= 0) 0
+        else (cap - 1) * perQ + qSec
 
-        val qIndex = (elapsedSec / perQ).coerceIn(0, capped - 1)
+        val elapsedSec = ((nowMillis - startAtMillis) / 1000L).toInt().coerceAtLeast(0)
+        if (elapsedSec >= totalTimeline) return ChallengeState.Finished(score())
+
+        val qIndex = (elapsedSec / perQ).coerceIn(0, cap - 1)
         val tInBlock = elapsedSec % perQ
         val q = questions[qIndex]
 
-        return if (tInBlock < ChallengeConfig.QUESTION_SEC) {
-            val remaining = ChallengeConfig.QUESTION_SEC - tInBlock
+        return if (tInBlock < qSec) {
+            val remaining = qSec - tInBlock
             ChallengeState.Question(
                 index = qIndex,
                 remainingSec = remaining,
@@ -59,11 +58,5 @@ class ChallengeEngine(
         }
     }
 
-    private fun score(): Int {
-        var s = 0
-        for (i in 0 until capped) {
-            if (selections[i] == questions[i].answer_id) s++
-        }
-        return s
-    }
+    private fun score(): Int = (0 until cap).count { selections[it] == questions[it].answer_id }
 }
