@@ -67,7 +67,6 @@ class ScheduleViewModel @Inject constructor(
                 when {
                     remainingMs <= 0L -> {
                         _ui.value = ScheduleUiState.StartNow
-                        repo.clearScheduledAt()
                         break
                     }
                     remainingMs <= 20_000L -> {
