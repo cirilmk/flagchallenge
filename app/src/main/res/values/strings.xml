@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">FlagChallenge</string>
+    <string name="challenge_schedule">CHALLENGE SCHEDULE</string>
+    <string name="already_on_schedule">Already on a schedule. \nYou can reschedule if required</string>
+    <string name="will_start_in">CHALLENGE WILL START IN</string>
+    <string name="save">Save</string>
+    <string name="hour">Hour</string>
+    <string name="minute">Minute</string>
+    <string name="second">Second</string>
+    <string name="guess_the_country_from_the_flag">GUESS THE COUNTRY BY THE FLAG</string>
+    <string name="correct">CORRECT</string>
+    <string name="wrong">WRONG</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="score">SCORE:</string>
+    <string name="flags_challenge">FLAGS CHALLENGE</string>
+    <string name="score_out_of">%1$s / %2$s</string>
+    <string name="default_timer_string">--:--</string>
+    <string name="question_number">%1$d</string>
+    <string name="time_format">00:%1$02d</string>
 </resources>

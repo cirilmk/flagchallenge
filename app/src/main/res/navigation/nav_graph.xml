@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/scheduleFragment">
+
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.ciril.flagchallenge.ui.schedule.ScheduleFragment"
+        android:label="Schedule" >
+        <action
+            android:id="@+id/action_schedule_to_challenge"
+            app:destination="@id/challengeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/challengeFragment"
+        android:name="com.ciril.flagchallenge.ui.challenge.ChallengeFragment"
+        android:label="Challenge" >
+        <action
+            android:id="@+id/action_challenge_to_result"
+            app:destination="@id/resultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.ciril.flagchallenge.ui.result.ResultFragment"
+        android:label="Result" />
+</navigation>

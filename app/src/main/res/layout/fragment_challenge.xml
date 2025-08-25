@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_grey_box"
+
+    android:layout_margin="2dp"
+    android:paddingBottom="32dp">
+
+    <include
+        layout="@layout/header_common" />
+
+
+    <!--Question number container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/questionContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_black_box_flat"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/separator_1">
+
+
+        <!-- Orange round question number INSIDE the black box -->
+        <TextView
+            android:id="@+id/tvQIndex"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/bg_circle_orange"
+            tools:text="2"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Prompt below the heading row -->
+    <TextView
+        android:id="@+id/tvPrompt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/guess_the_country_from_the_flag"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/colorOnSecondary"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@id/questionContainer"
+        app:layout_constraintStart_toEndOf="@id/questionContainer"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!-- Flag image (left) -->
+    <ImageView
+        android:id="@+id/ivFlag"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/flag"
+        app:layout_constraintTop_toTopOf="@id/btnOpt1"
+        app:layout_constraintBottom_toBottomOf="@id/btnOpt3"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Options Grid (2x2) to the right of flag -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpt1"
+        style="@style/OptionButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_option_default"
+        tools:text="Option 1"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/tvPrompt"
+        app:layout_constraintStart_toEndOf="@id/ivFlag"
+        app:layout_constraintEnd_toStartOf="@+id/btnOpt2"
+        android:layout_marginStart="12dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpt2"
+        style="@style/OptionButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_option_default"
+        tools:text="Option 2"
+        app:layout_constraintTop_toTopOf="@id/btnOpt1"
+        app:layout_constraintStart_toEndOf="@id/btnOpt1"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpt3"
+        style="@style/OptionButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_option_default"
+        tools:text="Option 3"
+        app:layout_constraintTop_toBottomOf="@id/tvLbl1"
+        app:layout_constraintStart_toStartOf="@id/btnOpt1"
+        app:layout_constraintEnd_toStartOf="@+id/btnOpt4"
+        android:layout_marginTop="2dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpt4"
+        style="@style/OptionButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_option_default"
+        tools:text="Option 4"
+        app:layout_constraintTop_toTopOf="@id/btnOpt3"
+        app:layout_constraintStart_toEndOf="@id/btnOpt3"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Feedback labels under each option -->
+    <TextView
+        android:id="@+id/tvLbl1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        style="@style/statusLabelTextViewStyle"
+        app:layout_constraintTop_toBottomOf="@id/btnOpt1"
+        app:layout_constraintStart_toStartOf="@id/btnOpt1"
+        app:layout_constraintEnd_toEndOf="@id/btnOpt1" />
+
+    <TextView
+        android:id="@+id/tvLbl2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/statusLabelTextViewStyle"
+        app:layout_constraintTop_toTopOf="@id/tvLbl1"
+        app:layout_constraintStart_toStartOf="@id/btnOpt2"
+        app:layout_constraintEnd_toEndOf="@id/btnOpt2" />
+
+    <TextView
+        android:id="@+id/tvLbl3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/statusLabelTextViewStyle"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@id/btnOpt3"
+        app:layout_constraintStart_toStartOf="@id/btnOpt3"
+        app:layout_constraintEnd_toEndOf="@id/btnOpt3" />
+
+    <TextView
+        android:id="@+id/tvLbl4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/statusLabelTextViewStyle"
+        app:layout_constraintTop_toTopOf="@id/tvLbl3"
+        app:layout_constraintStart_toStartOf="@id/btnOpt4"
+        app:layout_constraintEnd_toEndOf="@id/btnOpt4" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

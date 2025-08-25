@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.androidxNavigationSafeargs)
+    alias(libs.plugins.jetbrainsKotlinKapt)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -56,6 +59,7 @@ dependencies {
     // JSON parsing (Moshi)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
+    kapt(libs.moshi.kotlin.codegen)
 
     // Image loading (Coil)
     implementation(libs.coil)
@@ -64,8 +68,21 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
 
+    // Navigation
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+
+    // DI
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // Pref
+    implementation(libs.androidx.datastore.preferences)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.truth)
     androidTestImplementation(libs.androidx.espresso.core)
 }
