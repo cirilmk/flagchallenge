@@ -25,7 +25,7 @@ class ChallengeViewModel @Inject constructor(
     private val questionsRepo: ChallengeRepository,
     private val scheduleRepo: ScheduleDataSource,
     private val clock: AppClock,
-    private val dispatcher: CoroutineDispatcher // Provide Main.immediate via Hilt
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow<ChallengeState?>(null)
@@ -55,6 +55,8 @@ class ChallengeViewModel @Inject constructor(
         }
     }
 
+    /***
+     * A Ticker job to derive the engine each second and check the state*/
     private fun startTicker(startMillis: Long) {
         engine = ChallengeEngine(questions, startMillis)
         tickerJob = viewModelScope.launch(Dispatchers.Default) {
@@ -67,13 +69,17 @@ class ChallengeViewModel @Inject constructor(
         }
     }
 
+    /***User selection
+     * check the state, questions index and lock status based on that sending the selection to engine*/
     fun selectOption(questionIndex: Int, countryId: Int) {
         val eng = engine ?: return
-        val current = _ui.value
-        if (current is ChallengeState.Question && !current.isLocked && current.index == questionIndex) {
-            eng.selectOption(questionIndex, countryId)
-            // Reflect immediately (don’t wait for next tick)
-            _ui.value = eng.derive(clock.now())
+        when (val current = _ui.value) {
+            is ChallengeState.Question ->
+                if (current.index == questionIndex) {
+                    eng.selectOption(questionIndex, countryId)
+                    _ui.value = eng.derive(clock.now())
+                }
+            else -> Unit
         }
     }
 

@@ -25,7 +25,7 @@ fun MaterialButton.applyOptionState(
             labelView.setTextColor(context.getColor(R.color.correctGreen))
         }
         OptionState.WRONG -> {
-            setBackgroundResource(R.drawable.bg_option_selected) // stays solid primary
+            setBackgroundResource(R.drawable.bg_option_selected)
             labelView.text = context.getString(R.string.wrong)
             labelView.setTextColor(context.getColor(R.color.wrongRed))
         }

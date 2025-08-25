@@ -42,8 +42,7 @@ class ChallengeEngine(
                 index = qIndex,
                 remainingSec = remaining,
                 question = q,
-                selectionId = selections[qIndex].takeIf { it != -1 },
-                isLocked = remaining == 0
+                selectionId = selections[qIndex].takeIf { it != -1 }
             )
         } else {
             val remaining = perQ - tInBlock

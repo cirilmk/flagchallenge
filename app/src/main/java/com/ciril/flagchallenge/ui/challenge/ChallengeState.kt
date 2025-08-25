@@ -5,11 +5,10 @@ import com.ciril.flagchallenge.model.FlagQuestion
 
 sealed class ChallengeState {
     data class Question(
-        val index: Int,
-        val remainingSec: Int,
-        val question: FlagQuestion,
-        val selectionId: Int?,
-        val isLocked: Boolean
+        val index: Int, //Index of question
+        val remainingSec: Int, // Remaining time in sec
+        val question: FlagQuestion, // Question
+        val selectionId: Int?, // User selection id of country
     ) : ChallengeState()
 
     data class Interval(

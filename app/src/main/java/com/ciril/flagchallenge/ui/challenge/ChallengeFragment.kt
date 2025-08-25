@@ -65,7 +65,6 @@ class ChallengeFragment : Fragment() {
                                 q = s.question,
                                 qIndex = s.index,
                                 selectionId = s.selectionId,
-                                isLocked = s.isLocked,
                                 isInterval = false
                             )
 
@@ -83,7 +82,6 @@ class ChallengeFragment : Fragment() {
                                 q = s.question,
                                 qIndex = s.index,
                                 selectionId = s.selectionId,
-                                isLocked = true,
                                 isInterval = true
                             )
 
@@ -110,7 +108,6 @@ class ChallengeFragment : Fragment() {
         q: FlagQuestion,
         qIndex: Int,
         selectionId: Int?,
-        isLocked: Boolean,
         isInterval: Boolean
     ) {
         val btns: List<MaterialButton> = listOf(
@@ -133,7 +130,7 @@ class ChallengeFragment : Fragment() {
         if (!isInterval) {
             // Question phase
             q.countries.take(4).forEachIndexed { i, c ->
-                btns[i].isEnabled = !isLocked
+                btns[i].isEnabled = true
                 val state = if (selectionId == c.id) OptionState.SELECTED else OptionState.DEFAULT
                 btns[i].applyOptionState(state, lbls[i], requireContext())
                 lbls[i].text = ""
