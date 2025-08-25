@@ -20,6 +20,9 @@ private class FakeRepo : ScheduleDataSource {
     val flow = MutableStateFlow<Long?>(null)
     override suspend fun setScheduledAt(epochMillis: Long) { flow.value = epochMillis }
     override fun scheduledAt() = flow
+    override suspend fun clearScheduledAt() {
+        flow.value = null
+    }
 }
 
 private class FakeClock(var nowMs: Long) : AppClock {
@@ -55,8 +58,6 @@ class ScheduleViewModelTest {
 
     @Test
     fun `idle when nothing scheduled`() = runTest(dispatcher) {
-        // VM collects repo(null) in init; first state is Idle
-        // No need to advance time; first tick sets immediately
         assertThat(vm.ui.value).isInstanceOf(ScheduleUiState.Idle::class.java)
     }
 
@@ -65,7 +66,6 @@ class ScheduleViewModelTest {
         // Sets scheduledAt = now; remaining <= 0 -> StartNow
         vm.saveSchedule(0, 0, 0)
 
-        // Process pending coroutines once
         dispatcher.scheduler.runCurrent()
 
         assertThat(vm.ui.value).isInstanceOf(ScheduleUiState.StartNow::class.java)

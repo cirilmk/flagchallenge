@@ -23,6 +23,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
 
+    companion object {
+        private const val KEY_REVEALED = "revealed"
+        private const val REVEAL_DELAY_MS = 1000L
+        private const val FADE_MS = 250L
+    }
+
     @Inject
     lateinit var scheduleRepo: ScheduleDataSource
 
@@ -46,17 +52,13 @@ class ResultFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        revealed = savedInstanceState?.getBoolean("revealed") ?: false
+        revealed = savedInstanceState?.getBoolean(KEY_REVEALED) ?: false
 
         // get score from args (you already navigate with "score")
         val score = arguments?.getInt("score") ?: 0
-        val scoreStr = String.format("%02d", score)
-        val totalQuestionsStr = String.format("%02d", ChallengeConfig.TOTAL_QUESTIONS)
-        binding.tvScoreValue.text = getString(
-            R.string.score_out_of,
-            scoreStr,
-            totalQuestionsStr
-        )
+        val scoreStr = "%02d".format(score)
+        val totalStr = "%02d".format(ChallengeConfig.TOTAL_QUESTIONS)
+        binding.tvScoreValue.text = getString(R.string.score_out_of, scoreStr, totalStr)
 
         if (revealed) {
             // Show score immediately, don’t animate again
@@ -69,9 +71,9 @@ class ResultFragment : Fragment() {
             binding.tvGameOver.visibility = View.VISIBLE
             binding.scoreContainer.visibility = View.GONE
 
+            revealed = true
             revealJob = viewLifecycleOwner.lifecycleScope.launch {
-                delay(1000)
-                revealed = true
+                delay(REVEAL_DELAY_MS)
                 crossfadeGameOverToScore()
             }
         }
@@ -86,6 +88,7 @@ class ResultFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     revealJob?.cancel() // stop pending reveal
+                    revealJob = null
                     findNavController().popBackStack(R.id.scheduleFragment, false)
                 }
             }
@@ -97,7 +100,7 @@ class ResultFragment : Fragment() {
         // Fade out GAME OVER
         binding.tvGameOver.animate()
             .alpha(0f)
-            .setDuration(250)
+            .setDuration(FADE_MS)
             .withEndAction {
                 binding.tvGameOver.visibility = View.GONE
                 binding.scoreContainer.apply {
@@ -109,9 +112,16 @@ class ResultFragment : Fragment() {
             .start()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_REVEALED, revealed)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
+        revealJob?.cancel()
+        revealJob = null
         _binding = null
     }
 }
